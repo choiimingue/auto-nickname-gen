@@ -1,0 +1,38 @@
+{
+  "name": "auto-nickname-js",
+  "version": "1.0.0",
+  "description": "랜덤 닉네임 생성기 (한국어, 일본어, 대만어 지원)",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "node test/example.js",
+    "prepublishOnly": "npm test"
+  },
+  "keywords": [
+    "nickname",
+    "random",
+    "generator",
+    "korean",
+    "japanese",
+    "chinese"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/auto-nickname-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/auto-nickname-js/issues"
+  },
+  "homepage": "https://github.com/yourusername/auto-nickname-js#readme",
+  "files": [
+    "src/**/*",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}

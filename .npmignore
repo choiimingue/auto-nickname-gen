@@ -1,0 +1,17 @@
+# 개발 관련 파일들
+test/
+.git/
+.gitignore
+.npmignore
+
+# IDE 설정
+.vscode/
+.idea/
+
+# 로그 파일들
+*.log
+npm-debug.log*
+
+# 임시 파일들
+.DS_Store
+Thumbs.db 

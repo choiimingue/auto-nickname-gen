@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Nickname Generator - Web Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .control-group label {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .control-group select, .control-group input {
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .control-group select:focus, .control-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .generate-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+            grid-column: 1 / -1;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .results {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .nickname-item {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .nickname-text {
+            font-size: 18px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .copy-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: #5a6fd8;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 600px) {
+            .controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 Auto Nickname Generator</h1>
+            <p>한국어, 일본어, 중국어 랜덤 닉네임 생성기</p>
+        </div>
+        
+        <div class="content">
+            <div class="controls">
+                <div class="control-group">
+                    <label for="language">언어 선택:</label>
+                    <select id="language">
+                        <option value="random">🌍 랜덤</option>
+                        <option value="korean">🇰🇷 한국어</option>
+                        <option value="japanese">🇯🇵 일본어</option>
+                        <option value="chinese">🇨🇳 중국어</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label for="count">생성 개수:</label>
+                    <input type="number" id="count" value="5" min="1" max="20">
+                </div>
+                
+                <button class="generate-btn" onclick="generateNicknames()">
+                    🎲 닉네임 생성하기
+                </button>
+            </div>
+            
+            <div class="results" id="results" style="display: none;">
+                <h3>생성된 닉네임:</h3>
+                <div id="nicknameList"></div>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="koreanCount">36+60</div>
+                    <div class="stat-label">한국어 단어</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="japaneseCount">40+54</div>
+                    <div class="stat-label">일본어 단어</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="chineseCount">40+56</div>
+                    <div class="stat-label">중국어 단어</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 간단한 닉네임 생성 로직 (실제 패키지 대신)
+        const koreanAdjectives = ['행복한', '멋진', '강한', '예쁜', '신나는', '차분한', '즐거운', '특별한', '완벽한', '대담한'];
+        const koreanNouns = ['고양이', '강아지', '나비', '꽃', '별', '달', '해', '바다', '산', '숲'];
+        
+        const japaneseAdjectives = ['たのしい', 'きれい', 'つよい', 'かわいい', 'おもしろい', 'しずか', 'げんき', 'やさしい', 'すてき', 'かっこいい'];
+        const japaneseNouns = ['ねこ', 'いぬ', 'ちょう', 'はな', 'ほし', 'つき', 'たいよう', 'うみ', 'やま', 'もり'];
+        
+        const chineseAdjectives = ['快樂', '美麗', '強壯', '可愛', '有趣', '安靜', '健康', '溫柔', '完美', '勇敢'];
+        const chineseNouns = ['貓', '狗', '蝴蝶', '花', '星星', '月亮', '太陽', '海', '山', '森林'];
+
+        function getRandomNumber(digits = 7) {
+            let num = '';
+            for (let i = 0; i < digits; i++) {
+                num += Math.floor(Math.random() * 10);
+            }
+            return num;
+        }
+
+        function pickRandom(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function generateNickname(language = 'random') {
+            let adjectives, nouns;
+            
+            if (language === 'korean') {
+                adjectives = koreanAdjectives;
+                nouns = koreanNouns;
+            } else if (language === 'japanese') {
+                adjectives = japaneseAdjectives;
+                nouns = japaneseNouns;
+            } else if (language === 'chinese') {
+                adjectives = chineseAdjectives;
+                nouns = chineseNouns;
+            } else {
+                const langs = ['korean', 'japanese', 'chinese'];
+                return generateNickname(pickRandom(langs));
+            }
+            
+            return `${pickRandom(adjectives)} ${pickRandom(nouns)} ${getRandomNumber(7)}`;
+        }
+
+        function generateNicknames() {
+            const language = document.getElementById('language').value;
+            const count = parseInt(document.getElementById('count').value);
+            
+            const results = document.getElementById('results');
+            const nicknameList = document.getElementById('nicknameList');
+            
+            nicknameList.innerHTML = '';
+            
+            for (let i = 0; i < count; i++) {
+                const nickname = generateNickname(language);
+                const nicknameItem = document.createElement('div');
+                nicknameItem.className = 'nickname-item';
+                nicknameItem.innerHTML = `
+                    <span class="nickname-text">${i + 1}. ${nickname}</span>
+                    <button class="copy-btn" onclick="copyToClipboard('${nickname}')">복사</button>
+                `;
+                nicknameList.appendChild(nicknameItem);
+            }
+            
+            results.style.display = 'block';
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('닉네임이 클립보드에 복사되었습니다!');
+            }).catch(err => {
+                console.error('복사 실패:', err);
+            });
+        }
+
+        // 페이지 로드 시 초기 생성
+        window.onload = function() {
+            generateNicknames();
+        };
+    </script>
+</body>
+</html> 
