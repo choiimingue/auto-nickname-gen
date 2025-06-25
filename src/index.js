@@ -1,25 +1,51 @@
 const fs = require('fs');
 const path = require('path');
 
-function loadWordList(filename) {
+function loadWordListFromCSV(filename) {
   const filePath = path.join(__dirname, 'data', filename);
-  return fs.readFileSync(filePath, 'utf-8')
+  const lines = fs.readFileSync(filePath, 'utf-8')
     .split('\n')
     .map(line => line.trim())
     .filter(Boolean);
+
+  const adjectives = [];
+  const nouns = [];
+  
+  for (const line of lines) {
+    if (line.startsWith('Type')) continue; // 헤더 스킵
+    const [type, category, word, translation] = line.split(',');
+    if (type === 'Adjective') {
+      adjectives.push(word);
+    } else if (type === 'Noun') {
+      nouns.push(word);
+    }
+  }
+  
+  return { adjectives, nouns };
 }
 
 class NicknameGenerator {
   constructor() {
-    this.koreanAdjectives = loadWordList('korean_adjectives.txt');
-    this.koreanNouns = loadWordList('korean_nouns.txt');
-    this.japaneseAdjectives = loadWordList('japanese_adjectives.txt');
-    this.japaneseNouns = loadWordList('japanese_nouns.txt');
-    this.chineseAdjectives = loadWordList('chinese_adjectives.txt');
-    this.chineseNouns = loadWordList('chinese_nouns.txt');
+    // CSV 파일에서 단어 로드
+    const korean = loadWordListFromCSV('kr_words.csv');
+    const japanese = loadWordListFromCSV('jp_words.csv');
+    const chinese = loadWordListFromCSV('tw_words.csv');
+    
+    // 단어 조합이 10자를 넘지 않도록 필터링
+    this.koreanAdjectives = this.filterWordsByLength(korean.adjectives, 5);
+    this.koreanNouns = this.filterWordsByLength(korean.nouns, 5);
+    this.japaneseAdjectives = this.filterWordsByLength(japanese.adjectives, 5);
+    this.japaneseNouns = this.filterWordsByLength(japanese.nouns, 5);
+    this.chineseAdjectives = this.filterWordsByLength(chinese.adjectives, 5);
+    this.chineseNouns = this.filterWordsByLength(chinese.nouns, 5);
   }
 
-  generateRandomNumber(digits = 7) {
+  // 단어 길이를 제한하는 필터 함수
+  filterWordsByLength(words, maxLength) {
+    return words.filter(word => word.length <= maxLength);
+  }
+
+  generateRandomNumber(digits = 10) {
     let num = '';
     for (let i = 0; i < digits; i++) {
       num += Math.floor(Math.random() * 10);
@@ -46,7 +72,12 @@ class NicknameGenerator {
       const langs = ['korean', 'japanese', 'chinese'];
       return this.generateNickname(this.pick(langs));
     }
-    return `${this.pick(adjectives)} ${this.pick(nouns)} ${this.generateRandomNumber(7)}`;
+    
+    const adjective = this.pick(adjectives);
+    const noun = this.pick(nouns);
+    const randomNum = this.generateRandomNumber(10);
+    
+    return `${adjective} ${noun} ${randomNum}`;
   }
 
   generateMultipleNicknames(count = 5, language = 'random') {
